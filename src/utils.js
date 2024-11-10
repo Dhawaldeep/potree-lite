@@ -75,12 +75,13 @@ export class Utils {
 	static debugLine(parent, start, end, color) {
 
 		let material = new THREE.LineBasicMaterial({ color: color });
-		let geometry = new THREE.Geometry();
+		let geometry = new THREE.BufferGeometry();
 
 		const p1 = new THREE.Vector3(0, 0, 0);
 		const p2 = end.clone().sub(start);
 
-		geometry.vertices.push(p1, p2);
+		geometry.setFromPoints([p1, p2]);
+		// geometry.vertices.push(p1, p2);
 
 		let tl = new THREE.Line(geometry, material);
 		tl.position.copy(start);
@@ -102,8 +103,8 @@ export class Utils {
 	static debugCircle(parent, center, radius, normal, color) {
 		let material = new THREE.LineBasicMaterial({ color: color });
 
-		let geometry = new THREE.Geometry();
-
+		let geometry = new THREE.BufferGeometry();
+		const geomPoints = [];
 		let n = 32;
 		for (let i = 0; i <= n; i++) {
 			let u0 = 2 * Math.PI * (i / n);
@@ -121,8 +122,11 @@ export class Utils {
 				0
 			);
 
-			geometry.vertices.push(p0, p1);
+			geomPoints.push([p0, p1]);
+			// geometry.vertices.push(p0, p1);
 		}
+
+		geometry.setFromPoints(geomPoints);
 
 		let tl = new THREE.Line(geometry, material);
 		tl.position.copy(center);
@@ -321,7 +325,7 @@ export class Utils {
 			}
 		}
 
-		let skyGeometry = new THREE.CubeGeometry(700, 700, 700);
+		let skyGeometry = new THREE.BoxGeometry(700, 700, 700);
 		let skybox = new THREE.Mesh(skyGeometry, materialArray);
 
 		scene.add(skybox);
@@ -342,18 +346,25 @@ export class Utils {
 			color: color || 0x888888
 		});
 
-		let geometry = new THREE.Geometry();
+		let geometry = new THREE.BufferGeometry();
+		const geomPoints = [];
 		for (let i = 0; i <= length; i++) {
-			geometry.vertices.push(new THREE.Vector3(-(spacing * width) / 2, i * spacing - (spacing * length) / 2, 0));
-			geometry.vertices.push(new THREE.Vector3(+(spacing * width) / 2, i * spacing - (spacing * length) / 2, 0));
+			geomPoints.push(new THREE.Vector3(-(spacing * width) / 2, i * spacing - (spacing * length) / 2, 0));
+			geomPoints.push(new THREE.Vector3(+(spacing * width) / 2, i * spacing - (spacing * length) / 2, 0));
+			// geometry.vertices.push(new THREE.Vector3(-(spacing * width) / 2, i * spacing - (spacing * length) / 2, 0));
+			// geometry.vertices.push(new THREE.Vector3(+(spacing * width) / 2, i * spacing - (spacing * length) / 2, 0));
 		}
 
 		for (let i = 0; i <= width; i++) {
-			geometry.vertices.push(new THREE.Vector3(i * spacing - (spacing * width) / 2, -(spacing * length) / 2, 0));
-			geometry.vertices.push(new THREE.Vector3(i * spacing - (spacing * width) / 2, +(spacing * length) / 2, 0));
+			geomPoints.push(new THREE.Vector3(i * spacing - (spacing * width) / 2, -(spacing * length) / 2, 0));
+			geomPoints.push(new THREE.Vector3(i * spacing - (spacing * width) / 2, +(spacing * length) / 2, 0));
+			// geometry.vertices.push(new THREE.Vector3(i * spacing - (spacing * width) / 2, -(spacing * length) / 2, 0));
+			// geometry.vertices.push(new THREE.Vector3(i * spacing - (spacing * width) / 2, +(spacing * length) / 2, 0));
 		}
 
-		let line = new THREE.LineSegments(geometry, material, THREE.LinePieces);
+		geometry.setFromPoints(geomPoints);
+
+		let line = new THREE.LineSegments(geometry, material);
 		line.receiveShadow = true;
 		return line;
 	}
@@ -1081,7 +1092,7 @@ export class Utils {
 
 Utils.screenPass = new function () {
 	this.screenScene = new THREE.Scene();
-	this.screenQuad = new THREE.Mesh(new THREE.PlaneBufferGeometry(2, 2, 1));
+	this.screenQuad = new THREE.Mesh(new THREE.PlaneGeometry(2, 2, 1));
 	this.screenQuad.material.depthTest = true;
 	this.screenQuad.material.depthWrite = true;
 	this.screenQuad.material.transparent = true;

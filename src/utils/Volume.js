@@ -1,12 +1,12 @@
 
 import * as THREE from "../../libs/three.js/build/three.module.js";
-import {TextSprite} from "../TextSprite.js";
+import { TextSprite } from "../TextSprite.js";
 
 export class Volume extends THREE.Object3D {
-	constructor (args = {}) {
+	constructor(args = {}) {
 		super();
 
-		if(this.constructor.name === "Volume"){
+		if (this.constructor.name === "Volume") {
 			console.warn("Can't create object of class Volume directly. Use classes BoxVolume or SphereVolume instead.");
 		}
 
@@ -20,8 +20,8 @@ export class Volume extends THREE.Object3D {
 		this._modifiable = args.modifiable || true;
 
 		this.label = new TextSprite('0');
-		this.label.setBorderColor({r: 0, g: 255, b: 0, a: 0.0});
-		this.label.setBackgroundColor({r: 0, g: 255, b: 0, a: 0.0});
+		this.label.setBorderColor({ r: 0, g: 255, b: 0, a: 0.0 });
+		this.label.setBackgroundColor({ r: 0, g: 255, b: 0, a: 0.0 });
 		this.label.material.depthTest = false;
 		this.label.material.depthWrite = false;
 		this.label.material.transparent = true;
@@ -37,48 +37,48 @@ export class Volume extends THREE.Object3D {
 			this.label.matrixWorldNeedsUpdate = false;
 
 			for (let i = 0, l = this.label.children.length; i < l; i++) {
-				this.label.children[ i ].updateMatrixWorld(true);
+				this.label.children[i].updateMatrixWorld(true);
 			}
 		};
 
 		{ // event listeners
-			this.addEventListener('select', e => {});
-			this.addEventListener('deselect', e => {});
+			this.addEventListener('select', e => { });
+			this.addEventListener('deselect', e => { });
 		}
 
 	}
 
-	get visible(){
+	get visible() {
 		return this._visible;
 	}
 
-	set visible(value){
-		if(this._visible !== value){
+	set visible(value) {
+		if (this._visible !== value) {
 			this._visible = value;
 
-			this.dispatchEvent({type: "visibility_changed", object: this});
+			this.dispatchEvent({ type: "visibility_changed", object: this });
 		}
 	}
 
-	getVolume () {
+	getVolume() {
 		console.warn("override this in subclass");
 	}
 
-	update () {
-		
+	update() {
+
 	};
 
-	raycast (raycaster, intersects) {
+	raycast(raycaster, intersects) {
 
 	}
 
-	get clip () {
+	get clip() {
 		return this._clip;
 	}
 
-	set clip (value) {
+	set clip(value) {
 
-		if(this._clip !== value){
+		if (this._clip !== value) {
 			this._clip = value;
 
 			this.update();
@@ -88,14 +88,14 @@ export class Volume extends THREE.Object3D {
 				object: this
 			});
 		}
-		
+
 	}
 
-	get modifieable () {
+	get modifieable() {
 		return this._modifiable;
 	}
 
-	set modifieable (value) {
+	set modifieable(value) {
 		this._modifiable = value;
 
 		this.update();
@@ -103,9 +103,9 @@ export class Volume extends THREE.Object3D {
 };
 
 
-export class BoxVolume extends Volume{
+export class BoxVolume extends Volume {
 
-	constructor(args = {}){
+	constructor(args = {}) {
 		super(args);
 
 		this.constructor.counter = (this.constructor.counter === undefined) ? 0 : this.constructor.counter + 1;
@@ -114,41 +114,72 @@ export class BoxVolume extends Volume{
 		let boxGeometry = new THREE.BoxGeometry(1, 1, 1);
 		boxGeometry.computeBoundingBox();
 
-		let boxFrameGeometry = new THREE.Geometry();
+		let boxFrameGeometry = new THREE.BufferGeometry();
 		{
 			let Vector3 = THREE.Vector3;
 
-			boxFrameGeometry.vertices.push(
+			boxFrameGeometry.setFromPoints(
+				[
+					// bottom
+					new Vector3(-0.5, -0.5, 0.5),
+					new Vector3(0.5, -0.5, 0.5),
+					new Vector3(0.5, -0.5, 0.5),
+					new Vector3(0.5, -0.5, -0.5),
+					new Vector3(0.5, -0.5, -0.5),
+					new Vector3(-0.5, -0.5, -0.5),
+					new Vector3(-0.5, -0.5, -0.5),
+					new Vector3(-0.5, -0.5, 0.5),
+					// top
+					new Vector3(-0.5, 0.5, 0.5),
+					new Vector3(0.5, 0.5, 0.5),
+					new Vector3(0.5, 0.5, 0.5),
+					new Vector3(0.5, 0.5, -0.5),
+					new Vector3(0.5, 0.5, -0.5),
+					new Vector3(-0.5, 0.5, -0.5),
+					new Vector3(-0.5, 0.5, -0.5),
+					new Vector3(-0.5, 0.5, 0.5),
+					// sides
+					new Vector3(-0.5, -0.5, 0.5),
+					new Vector3(-0.5, 0.5, 0.5),
+					new Vector3(0.5, -0.5, 0.5),
+					new Vector3(0.5, 0.5, 0.5),
+					new Vector3(0.5, -0.5, -0.5),
+					new Vector3(0.5, 0.5, -0.5),
+					new Vector3(-0.5, -0.5, -0.5),
+					new Vector3(-0.5, 0.5, -0.5),
+				]
+			)
+			// boxFrameGeometry.vertices.push(
 
-				// bottom
-				new Vector3(-0.5, -0.5, 0.5),
-				new Vector3(0.5, -0.5, 0.5),
-				new Vector3(0.5, -0.5, 0.5),
-				new Vector3(0.5, -0.5, -0.5),
-				new Vector3(0.5, -0.5, -0.5),
-				new Vector3(-0.5, -0.5, -0.5),
-				new Vector3(-0.5, -0.5, -0.5),
-				new Vector3(-0.5, -0.5, 0.5),
-				// top
-				new Vector3(-0.5, 0.5, 0.5),
-				new Vector3(0.5, 0.5, 0.5),
-				new Vector3(0.5, 0.5, 0.5),
-				new Vector3(0.5, 0.5, -0.5),
-				new Vector3(0.5, 0.5, -0.5),
-				new Vector3(-0.5, 0.5, -0.5),
-				new Vector3(-0.5, 0.5, -0.5),
-				new Vector3(-0.5, 0.5, 0.5),
-				// sides
-				new Vector3(-0.5, -0.5, 0.5),
-				new Vector3(-0.5, 0.5, 0.5),
-				new Vector3(0.5, -0.5, 0.5),
-				new Vector3(0.5, 0.5, 0.5),
-				new Vector3(0.5, -0.5, -0.5),
-				new Vector3(0.5, 0.5, -0.5),
-				new Vector3(-0.5, -0.5, -0.5),
-				new Vector3(-0.5, 0.5, -0.5),
+			// 	// bottom
+			// 	new Vector3(-0.5, -0.5, 0.5),
+			// 	new Vector3(0.5, -0.5, 0.5),
+			// 	new Vector3(0.5, -0.5, 0.5),
+			// 	new Vector3(0.5, -0.5, -0.5),
+			// 	new Vector3(0.5, -0.5, -0.5),
+			// 	new Vector3(-0.5, -0.5, -0.5),
+			// 	new Vector3(-0.5, -0.5, -0.5),
+			// 	new Vector3(-0.5, -0.5, 0.5),
+			// 	// top
+			// 	new Vector3(-0.5, 0.5, 0.5),
+			// 	new Vector3(0.5, 0.5, 0.5),
+			// 	new Vector3(0.5, 0.5, 0.5),
+			// 	new Vector3(0.5, 0.5, -0.5),
+			// 	new Vector3(0.5, 0.5, -0.5),
+			// 	new Vector3(-0.5, 0.5, -0.5),
+			// 	new Vector3(-0.5, 0.5, -0.5),
+			// 	new Vector3(-0.5, 0.5, 0.5),
+			// 	// sides
+			// 	new Vector3(-0.5, -0.5, 0.5),
+			// 	new Vector3(-0.5, 0.5, 0.5),
+			// 	new Vector3(0.5, -0.5, 0.5),
+			// 	new Vector3(0.5, 0.5, 0.5),
+			// 	new Vector3(0.5, -0.5, -0.5),
+			// 	new Vector3(0.5, 0.5, -0.5),
+			// 	new Vector3(-0.5, -0.5, -0.5),
+			// 	new Vector3(-0.5, 0.5, -0.5),
 
-			);
+			// );
 
 		}
 
@@ -157,20 +188,21 @@ export class BoxVolume extends Volume{
 			transparent: true,
 			opacity: 0.3,
 			depthTest: true,
-			depthWrite: false});
+			depthWrite: false
+		});
 		this.box = new THREE.Mesh(boxGeometry, this.material);
 		this.box.geometry.computeBoundingBox();
 		this.boundingBox = this.box.geometry.boundingBox;
 		this.add(this.box);
 
-		this.frame = new THREE.LineSegments(boxFrameGeometry, new THREE.LineBasicMaterial({color: 0x000000}));
+		this.frame = new THREE.LineSegments(boxFrameGeometry, new THREE.LineBasicMaterial({ color: 0x000000 }));
 		// this.frame.mode = THREE.Lines;
 		this.add(this.frame);
 
 		this.update();
 	}
 
-	update(){
+	update() {
 		this.boundingBox = this.box.geometry.boundingBox;
 		this.boundingSphere = this.boundingBox.getBoundingSphere(new THREE.Sphere());
 
@@ -183,7 +215,7 @@ export class BoxVolume extends Volume{
 		}
 	}
 
-	raycast (raycaster, intersects) {
+	raycast(raycaster, intersects) {
 		let is = [];
 		this.box.raycast(raycaster, is);
 
@@ -197,15 +229,15 @@ export class BoxVolume extends Volume{
 		}
 	}
 
-	getVolume(){
+	getVolume() {
 		return Math.abs(this.scale.x * this.scale.y * this.scale.z);
 	}
 
 };
 
-export class SphereVolume extends Volume{
+export class SphereVolume extends Volume {
 
-	constructor(args = {}){
+	constructor(args = {}) {
 		super(args);
 
 		this.constructor.counter = (this.constructor.counter === undefined) ? 0 : this.constructor.counter + 1;
@@ -219,7 +251,8 @@ export class SphereVolume extends Volume{
 			transparent: true,
 			opacity: 0.3,
 			depthTest: true,
-			depthWrite: false});
+			depthWrite: false
+		});
 		this.sphere = new THREE.Mesh(sphereGeometry, this.material);
 		this.sphere.visible = false;
 		this.sphere.geometry.computeBoundingBox();
@@ -229,20 +262,22 @@ export class SphereVolume extends Volume{
 		this.label.visible = false;
 
 
-		let frameGeometry = new THREE.Geometry();
+		let frameGeometry = new THREE.BufferGeometry();
 		{
 			let steps = 64;
 			let uSegments = 8;
 			let vSegments = 5;
 			let r = 1;
 
-			for(let uSegment = 0; uSegment < uSegments; uSegment++){
+			const geomPoints = [];
+
+			for (let uSegment = 0; uSegment < uSegments; uSegment++) {
 
 				let alpha = (uSegment / uSegments) * Math.PI * 2;
 				let dirx = Math.cos(alpha);
 				let diry = Math.sin(alpha);
 
-				for(let i = 0; i <= steps; i++){
+				for (let i = 0; i <= steps; i++) {
 					let v = (i / steps) * Math.PI * 2;
 					let vNext = v + 2 * Math.PI / steps;
 
@@ -253,24 +288,26 @@ export class SphereVolume extends Volume{
 					let xyAmountNext = Math.cos(vNext);
 
 					let vertex = new THREE.Vector3(dirx * xyAmount, diry * xyAmount, height);
-					frameGeometry.vertices.push(vertex);
+					geomPoints.push(vertex);
+					// frameGeometry.vertices.push(vertex);
 
 					let vertexNext = new THREE.Vector3(dirx * xyAmountNext, diry * xyAmountNext, heightNext);
-					frameGeometry.vertices.push(vertexNext);
+					geomPoints.push(vertexNext);
+					// frameGeometry.vertices.push(vertexNext);
 				}
 			}
 
 			// creates rings at poles, just because it's easier to implement
-			for(let vSegment = 0; vSegment <= vSegments + 1; vSegment++){
+			for (let vSegment = 0; vSegment <= vSegments + 1; vSegment++) {
 
 				//let height = (vSegment / (vSegments + 1)) * 2 - 1; // -1 to 1
 				let uh = (vSegment / (vSegments + 1)); // -1 to 1
-				uh = (1 - uh) * (-Math.PI / 2) + uh *(Math.PI / 2);
+				uh = (1 - uh) * (-Math.PI / 2) + uh * (Math.PI / 2);
 				let height = Math.sin(uh);
 
 				console.log(uh, height);
 
-				for(let i = 0; i <= steps; i++){
+				for (let i = 0; i <= steps; i++) {
 					let u = (i / steps) * Math.PI * 2;
 					let uNext = u + 2 * Math.PI / steps;
 
@@ -283,18 +320,22 @@ export class SphereVolume extends Volume{
 					let xyAmount = Math.sqrt(1 - height * height);
 
 					let vertex = new THREE.Vector3(dirx * xyAmount, diry * xyAmount, height);
-					frameGeometry.vertices.push(vertex);
+					geomPoints.push(vertex);
+					// frameGeometry.vertices.push(vertex);
 
 					let vertexNext = new THREE.Vector3(dirxNext * xyAmount, diryNext * xyAmount, height);
-					frameGeometry.vertices.push(vertexNext);
+					geomPoints.push(vertexNext);
+					// frameGeometry.vertices.push(vertexNext);
 				}
 			}
+			frameGeometry.setFromPoints(geomPoints)
 		}
 
-		this.frame = new THREE.LineSegments(frameGeometry, new THREE.LineBasicMaterial({color: 0x000000}));
+
+		this.frame = new THREE.LineSegments(frameGeometry, new THREE.LineBasicMaterial({ color: 0x000000 }));
 		this.add(this.frame);
 
-		let frameMaterial = new THREE.MeshBasicMaterial({wireframe: true, color: 0x000000});
+		let frameMaterial = new THREE.MeshBasicMaterial({ wireframe: true, color: 0x000000 });
 		this.frame = new THREE.Mesh(sphereGeometry, frameMaterial);
 		//this.add(this.frame);
 
@@ -305,7 +346,7 @@ export class SphereVolume extends Volume{
 		this.update();
 	}
 
-	update(){
+	update() {
 		this.boundingBox = this.sphere.geometry.boundingBox;
 		this.boundingSphere = this.boundingBox.getBoundingSphere(new THREE.Sphere());
 
@@ -318,7 +359,7 @@ export class SphereVolume extends Volume{
 		//}
 	}
 
-	raycast (raycaster, intersects) {
+	raycast(raycaster, intersects) {
 		let is = [];
 		this.sphere.raycast(raycaster, is);
 
@@ -331,9 +372,9 @@ export class SphereVolume extends Volume{
 			});
 		}
 	}
-	
+
 	// see https://en.wikipedia.org/wiki/Ellipsoid#Volume
-	getVolume(){
+	getVolume() {
 		return (4 / 3) * Math.PI * this.scale.x * this.scale.y * this.scale.z;
 	}
 

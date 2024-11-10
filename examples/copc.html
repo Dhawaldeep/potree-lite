@@ -51,13 +51,8 @@
       class="potree_container"
       style="position: absolute; width: 100%; height: 100%; left: 0px; top: 0px"
     >
-      <div
-        id="potree_render_area"
-        style="
-          background-image: url('../build/potree/resources/images/background.jpg');
-        "
-      ></div>
-      <div id="potree_sidebar_container"></div>
+      <div id="potree_render_area"></div>
+      <!-- <div id="potree_sidebar_container"></div> -->
     </div>
 
     <script type="module">
@@ -77,12 +72,14 @@
 
       viewer.setDescription("Loading COPC format");
 
-      viewer.loadGUI(() => {
-        viewer.setLanguage("en");
-        $("#menu_appearance").next().show();
-      });
+      // viewer.loadGUI(() => {
+      //   viewer.setLanguage("en");
+      //   $("#menu_appearance").next().show();
+      // });
 
-      var path = "../pointclouds/Pilot_0000_0125.copc.las";
+      var path = "../pointclouds/livermore_sfm_pointcloud.copc.las";
+      // var path = "../pointclouds/Pilot_0000_0125.copc.las";
+      // "C:\Users\dhawa\Documents\GitHub\potree-lite\pointclouds\livermore_sfm_pointcloud.copc.las"
       // var path = "../pointclouds/cell_tower.copc.las";
       // var path = "../pointclouds/lion_takanawa.copc.laz";
       var name = "lion";
@@ -111,7 +108,7 @@
         let material = e.pointcloud.material;
         material.size = 1;
         material.pointSizeType = Potree.PointSizeType.FIXED;
-        material.activeAttributeName = "classification";
+        material.activeAttributeName = "rgba";
         if (c) material.activeAttributeName = c;
 
         //reclor from the classification attribute
